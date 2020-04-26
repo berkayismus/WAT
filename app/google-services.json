@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "977873833754",
+    "firebase_url": "https://whyiate.firebaseio.com",
+    "project_id": "whyiate",
+    "storage_bucket": "whyiate.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:977873833754:android:a5ad4d75cdd9150b0a66a3",
+        "android_client_info": {
+          "package_name": "com.berkaycayli.wat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "977873833754-lepcugv5rc09f2fthhftm009d0tmrpgc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCigN_YWrLGw_0E5NYMAJeG_n5jEdAIAFI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "977873833754-lepcugv5rc09f2fthhftm009d0tmrpgc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

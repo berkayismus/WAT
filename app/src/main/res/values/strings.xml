@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Bugün Ne Yedim</string>
+    <string name="title_activity_deneme">Deneme</string>
+    <string name="title_home">Anasayfa</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Bildirimler</string>
+    <string name="title_activity_user_details">Kullanıcı Detayları</string>
+    <string name="tab_text_1">Sekme 1</string>
+    <string name="tab_text_2">Sekme 2</string>
+
+
+    <string-array name="targets">
+        <item>Kilo Kaybı</item>
+        <item>Kilomu Koru</item>
+        <item>Kilo Alımı</item>
+    </string-array>
+
+    <string-array name="genders">
+        <item>Erkek</item>
+        <item>Kadın</item>
+    </string-array>
+
+    <string-array name="actLevels">
+        <item>Erkek</item>
+        <item>Kadın</item>
+    </string-array>
+
+
+</resources>

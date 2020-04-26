@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient"
+    tools:context=".GuestActivity">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        app:cardCornerRadius="25dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="79dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginBottom="79dp"
+        app:cardBackgroundColor="@color/cardViewGuestColor"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <TextView
+                android:id="@+id/targetTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/birtdayTextView"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:text="Hedefin"
+                android:textColor="@color/tvTextColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/birtdayTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="60dp"
+                android:text="Doğum Yılın"
+                android:textColor="@color/tvTextColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/birtdayTextView"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="100dp"
+                android:text="Cinsiyetin"
+                android:textColor="@color/tvTextColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/birtdayTextView"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="140dp"
+                android:text="Kilon"
+                android:textColor="@color/tvTextColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/tvActLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/birtdayTextView"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="180dp"
+                android:text="Etk.Düzeyin"
+                android:textColor="@color/tvTextColor"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/birtdayTextView"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="220dp"
+                android:text="Boyun"
+                android:textColor="@color/tvTextColor"
+                android:textSize="20sp" />
+
+            <Spinner
+                android:id="@+id/spinnerHedef"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="140dp"
+                android:layout_marginTop="20dp" />
+
+            <Spinner
+                android:id="@+id/spinnerDogumYili"
+                android:layout_alignLeft="@id/spinnerHedef"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                android:popupBackground="#fff" />
+
+            <Spinner
+                android:id="@+id/spinnerCinsiyet"
+                android:layout_alignLeft="@id/spinnerHedef"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="100dp" />
+
+
+            <EditText
+                android:id="@+id/etKilo"
+                android:layout_alignLeft="@id/spinnerHedef"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/spinnerCinsiyet"
+                android:layout_marginTop="5dp"
+                android:textColorHint="@color/hintColor"
+                android:hint="kg"
+                android:inputType="numberDecimal"
+                android:textColor="@color/etTextColor" />
+
+
+            <Spinner
+                android:id="@+id/spinnerEtkinlikDuzeyi"
+                android:layout_alignLeft="@id/spinnerHedef"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/tvActLevel" />
+
+            <EditText
+                android:id="@+id/etBoy"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="140dp"
+                android:layout_marginTop="210dp"
+                android:inputType="numberDecimal"
+                android:textColorHint="@color/hintColor"
+                android:hint="cm"
+                android:textColor="@color/etTextColor" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="250dp"
+                android:layout_height="50dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="50dp"
+                android:layout_marginTop="260dp"
+                android:elevation="10dp"
+                app:cardBackgroundColor="@color/cardViewBackColor"
+                app:cardCornerRadius="25dp"
+                tools:layout_editor_absoluteX="-49dp"
+                tools:layout_editor_absoluteY="557dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:onClick="kaydetButton">
+
+                    <TextView
+                        android:id="@+id/textView7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text="Kaydet"
+                        android:textColor="@color/tvTextColor"
+                        android:textSize="20sp" />
+
+
+                </RelativeLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_takvim"
+        android:title="Takvim"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_ara"
+        android:icon="@drawable/action_ara"
+        android:title="Item"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_cikis"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:title="Çıkış Yap" />
+</menu>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="guestTextColor">#008577</color>
+
+    <color name="hintColor">#AFAFAF</color>
+    <color name="etTextColor">#fff</color>
+    <color name="tvTextColor">#fff</color>
+    <color name="cardViewBackColor">#D81B60</color>
+    <color name="spinnerBackcolor">#fff</color>
+    <color name="cardViewSaveColor">#B9F6CA</color>
+    <color name="tvSaveColor">#000000</color>
+    <color name="cardViewGuestColor">#3CA368</color>
+
+    <color name="toolbarTitleColor">#FFFFFF</color>
+
+    <color name="spinnerItemColor">#ff0c35</color>
+</resources>
