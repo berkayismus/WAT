@@ -17,4 +17,7 @@
         android:id="@+id/action_close"
         android:icon="@drawable/ic_close_black_24dp"
         android:title="Pencereyi Kapat" />
+    <item
+        android:id="@+id/action_besin_ekle"
+        android:title="Besin Ekle" />
 </menu>

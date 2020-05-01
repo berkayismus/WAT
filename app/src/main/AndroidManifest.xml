@@ -9,6 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".BesinEkleActivity"></activity>
         <activity
             android:name=".SearchActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -16,7 +17,9 @@
             android:name=".OgunActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".GuestActivity" />
-        <activity android:name=".UserRegister" android:theme="@style/AppTheme.NoActionBar">
+        <activity
+            android:name=".UserRegister"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

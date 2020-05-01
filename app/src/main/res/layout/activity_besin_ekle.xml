@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient"
+    tools:context=".BesinEkleActivity">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        app:hintTextColor="@color/tvTextColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/besin_ekle_tvBesinAd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColorHighlight="@color/tvTextColor"
+            android:hint="Besin Adı"
+            android:textColor="@color/tvTextColor"
+            android:textColorHint="@color/tvTextColor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="10dp"
+        app:hintTextColor="@color/tvTextColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/besin_ekle_tvBesinAdet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Besin Miktar"
+            android:textColor="@color/tvTextColor"
+            android:textColorHint="@color/tvTextColor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="10dp"
+        app:hintTextColor="@color/tvTextColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/besin_ekle_tvBesinKalori"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Besin Kalori"
+
+            android:inputType="number"
+            android:textColor="@color/tvTextColor"
+            android:textColorHint="@color/tvTextColor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout7"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="10dp"
+        app:hintTextColor="@color/tvTextColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout5">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/besin_ekle_tvBesinProtein"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Protein"
+            android:inputType="number"
+
+            android:textColor="@color/tvTextColor"
+            android:textColorHint="@color/tvTextColor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout6"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:hintTextColor="@color/tvTextColor"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout7">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/besin_ekle_tvBesinSeker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Şeker"
+            android:inputType="number"
+
+            android:textColor="@color/tvTextColor"
+            android:textColorHint="@color/tvTextColor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:hintTextColor="@color/tvTextColor"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout6">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/besin_ekle_tvBesinYag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Yağ"
+            android:inputType="number"
+            android:textColor="@color/tvTextColor"
+            android:textColorHint="@color/tvTextColor" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+
+        android:id="@+id/buttonBesinKaydet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@color/cardViewBackColor"
+        android:onClick="besinKaydet"
+        android:text="KAYDET"
+        android:textColor="@color/tvTextColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout3" />
+
+    <Button
+        android:id="@+id/buttonKapat"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@color/cardViewBackColor"
+        android:onClick="sayfaKapat"
+        android:text="KAPAT"
+        android:textColor="@color/tvTextColor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonBesinKaydet" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+

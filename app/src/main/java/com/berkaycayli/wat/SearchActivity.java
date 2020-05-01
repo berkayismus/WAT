@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -100,6 +101,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 return true;
             case R.id.action_close:
                 finish();
+                return true;
+            case R.id.action_besin_ekle:
+                startActivity(new Intent(getApplicationContext(),BesinEkleActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
