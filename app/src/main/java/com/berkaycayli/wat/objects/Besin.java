@@ -24,6 +24,9 @@ public class Besin {
         this.besin_yag = besin_yag;
     }
 
+    public Besin(Besin yeniBesin) {
+    }
+
     public String getBesin_id() {
         return besin_id;
     }

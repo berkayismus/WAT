@@ -8,12 +8,23 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.algolia.search.saas.Client;
+import com.algolia.search.saas.Index;
 import com.berkaycayli.wat.objects.Besin;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class BesinEkleActivity extends AppCompatActivity {
@@ -50,6 +61,7 @@ public class BesinEkleActivity extends AppCompatActivity {
         if (!tvBesinMiktar.getText().toString().equals(""))
             besinMiktar = tvBesinMiktar.getText().toString();
 
+
            if(besinAd.equals("") && besinMiktar.equals("")
            && besinKalori<=0 && besinProtein<=0 && besinSeker<=0 && besinYag<=0){
                // girilen değerler istenildiği gibi değilse;
@@ -57,9 +69,17 @@ public class BesinEkleActivity extends AppCompatActivity {
                textInputSıfırla();
            }
            else{
+
+               besinKalori = Integer.valueOf(tvBesinKalori.getText().toString());
+               besinProtein = Integer.valueOf(tvBesinProtein.getText().toString());
+               besinSeker = Integer.valueOf(tvBesinSeker.getText().toString());
+               besinYag = Integer.valueOf(tvBesinYag.getText().toString());
+
                // girilen değerler uygunsa kaydedelim
                String besinID = UUID.randomUUID().toString();
                Besin yeniBesin = new Besin(besinID,besinAd,besinMiktar,besinKalori,besinProtein,besinSeker,besinYag);
+               algoliaEkle(yeniBesin);
+
 
                // Firestoredaki Besinler koleksiyonuna besin ekleme fonksiyonu yazalım
                CollectionReference besinRef = db.collection("Besinler");
@@ -97,4 +117,19 @@ public class BesinEkleActivity extends AppCompatActivity {
     public void sayfaKapat(View v){
         finish();
     }
+
+
+    public void algoliaEkle(Besin yeniBesinObject) {
+
+        Client client = new Client("7TY31JT4VI","8dc615d927e06f9689b7b21ef4a9d92d");
+        Index index = client.getIndex("besinWAT");
+
+        try{
+            index.addObjectAsync(new JSONObject().put("besin_adi",yeniBesinObject.getBesin_adi()),null);
+        } catch (JSONException ex){
+            Toast.makeText(getApplicationContext(),"indexlerken hata",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
 }

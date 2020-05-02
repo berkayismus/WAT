@@ -12,22 +12,39 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.algolia.search.saas.AlgoliaException;
+import com.algolia.search.saas.Client;
+import com.algolia.search.saas.CompletionHandler;
+import com.algolia.search.saas.Index;
 import com.berkaycayli.wat.adapter.BesinAdapter;
 import com.berkaycayli.wat.objects.Besin;
 import com.berkaycayli.wat.objects.Ogunler;
 import com.berkaycayli.wat.objects.Users;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.WriteBatch;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
@@ -114,6 +131,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public boolean onQueryTextSubmit(String query) {
         Log.e("Yapılan arama: ",query);
+
         return true;
     }
 
@@ -121,6 +139,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     // aslında bu bir listener, harf girilip girilmediğini dinliyor
     @Override
     public boolean onQueryTextChange(String newText) {
+
+
+
         Log.e("Girilen harf: ",newText);
         return true;
     }
@@ -161,4 +182,36 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         super.onStop();
         besinAdapter.stopListening();
     }
+
+    public void searchWithAlgolia(){
+        Client client = new Client("7TY31JT4VI","d0758ab12ee292c58a951379ae2ad6b3");
+        Index index = client.getIndex("besinWAT");
+
+        CollectionReference besinRef = db.collection("Besinler");
+
+        Map<String,Object> besin1 = new HashMap<>();
+        besin1.put("title","besin1");
+        WriteBatch writeBatch = db.batch();
+        writeBatch.set(besinRef.document(),besin1);
+        writeBatch.commit();
+
+
+
+
+
+        // algolia
+        List<JSONObject> besinList = new ArrayList<>();
+        besinList.add(new JSONObject(besin1));
+        index.addObjectsAsync(new JSONArray(besinList),null);
+
+
+        // algolia
+
+        // arama yapmak
+
+
+
+    }
+
+
 }

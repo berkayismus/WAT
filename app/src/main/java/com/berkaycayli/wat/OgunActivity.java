@@ -21,12 +21,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.algolia.search.saas.Client;
+import com.algolia.search.saas.Index;
 import com.berkaycayli.wat.adapter.OgunAdapter;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,6 +55,8 @@ public class OgunActivity extends AppCompatActivity {
     private FirebaseAuth userAuth = FirebaseAuth.getInstance();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference userColRef = db.collection("Users");
+
+
 
     @Override
     protected void onStart() {
@@ -78,6 +85,7 @@ public class OgunActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ogun);
+
 
         // widgetleri init etme (initial = başlatma) - arayüzdeki elemanları başlatmak için fonksiyon oluşturdum
         // aslında kısaca findViewById kısımlarını tek bir yerde topladım
