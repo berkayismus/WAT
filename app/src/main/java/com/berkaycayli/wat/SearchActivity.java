@@ -25,6 +25,7 @@ import com.berkaycayli.wat.objects.Ogunler;
 import com.berkaycayli.wat.objects.Users;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -60,6 +61,13 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private RecyclerView recyclerViewBesin;
     private BesinAdapter besinAdapter;
 
+    // besin ekleme yapabilmek için oluşturulan değişkenler
+    CollectionReference ogunRef = db.collection("Ogunler");
+    ArrayList<String> besinIDArray = new ArrayList<String>();
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+    FirebaseUser currentUser = mAuth.getCurrentUser();
+    String ogunTuru = ""; // Öğün türü önceki sayfadan intent ile gelecek ( Seçilen öğüne göre )
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +82,10 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         // recyclerview düzenlemelerini aşağıdaki fonksiyonda gerçekleştiriyorum
         setupRecyclerView();
+
+        // Öğün türünü intent ile önceki aktiviteden alalım
+        Bundle extras = getIntent().getExtras();
+        ogunTuru = extras.getString("ogun_turu");
 
 
     }
@@ -165,7 +177,30 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
                 Besin besin = documentSnapshot.toObject(Besin.class);
-                Toast.makeText(getApplicationContext(),"Seçilen besin : "+besin.getBesin_adi(),Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(getApplicationContext(),"Seçilen besin : "+besin.getBesin_adi(),Toast.LENGTH_SHORT).show();
+                // besin ekleme yapılıyor
+                String userID = currentUser.getUid();
+                String ogun_tarihi = GuestActivity.getBugun();
+                String ogunID = userID+"/"+GuestActivity.getBugun()+"/"+ogunTuru;
+                besinIDArray.add(besin.getBesin_id());
+                // Ogunlerden yeni nesne üretmek için parametre list =>
+                // ArrayList<String> besin_id, String ogun_id, String ogun_tarihi, String ogun_turu, String user_id
+                Ogunler ogun = new Ogunler(besinIDArray,ogunID,ogun_tarihi,ogunTuru,userID);
+                ogunRef.document(userID+"/"+GuestActivity.getBugun()+"/"+ogunTuru).set(ogun)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(getApplicationContext(),"Seçtiğiniz besin öğününüze eklendi",Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(),"Besin eklerken hata ile karşılaşıldı",Toast.LENGTH_SHORT).show();
+                        Log.e("Firestore", "Besin eklerken hata",e);
+                    }
+                });
+
             }
         });
 

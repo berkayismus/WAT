@@ -43,7 +43,7 @@ public class OgunActivity extends AppCompatActivity {
 
     // Widgetleri tanımlama
     private TextView tvKalanKalori, tvAlinanKalori, tvKalanKaloriNumber, tvAlinanKaloriNumber;
-    private ImageView imageViewSabahAcKapa,imageViewOglenAcKapa,imageViewAksamAcKapa,imageViewSabah;
+    private ImageView imageViewSabahAcKapa,imageViewOglenAcKapa,imageViewAksamAcKapa,imageViewSabah,imageViewOgle,imageViewAksam;
     private Toolbar toolbar;
 
     // RecyclerView & Adapterları tanımlama
@@ -171,6 +171,9 @@ public class OgunActivity extends AppCompatActivity {
         rvAksam = findViewById(R.id.rvAksam);
 
         imageViewSabah = findViewById(R.id.imageViewSabah);
+        imageViewOgle = findViewById(R.id.imageViewOgle);
+        imageViewAksam = findViewById(R.id.imageViewAksam);
+
 
     }
 
@@ -257,9 +260,24 @@ public class OgunActivity extends AppCompatActivity {
         imageViewSabah.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),SearchActivity.class));
+                startActivity(new Intent(getApplicationContext(),SearchActivity.class).putExtra("ogun_turu","sabah"));
             }
         });
+        // Öğle cardView'ının + ikonuna tıklandığında olacağı belirliyorum
+        imageViewOgle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),SearchActivity.class).putExtra("ogun_turu","ogle"));
+            }
+        });
+        // Akşam cardView'ının + ikonuna tıklandığında olacağı belirliyorum
+        imageViewAksam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(),SearchActivity.class).putExtra("ogun_turu","aksam"));
+            }
+        });
+
     }
 
 } // class sonu

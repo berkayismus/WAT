@@ -1,38 +1,41 @@
 package com.berkaycayli.wat.objects;
 
+import java.util.ArrayList;
+
 public class Ogunler {
 
-    private Users user;
+  private ArrayList<String> besin_id;
+  private String ogun_id;
+  private String ogun_tarihi;
+  private String ogun_turu;
+  private String user_id;
 
-    private String ogun_turu;
-    private String ogun_tarihi;
-    private Besin besin;
-
-    public Ogunler(){
+    public Ogunler() {
         // boş constructor
     }
 
-    public Ogunler(Users user, String ogun_turu, String ogun_tarihi, Besin besin) {
-        this.user = user;
-        this.ogun_turu = ogun_turu;
+    public Ogunler(ArrayList<String> besin_id, String ogun_id, String ogun_tarihi, String ogun_turu, String user_id) {
+        this.besin_id = besin_id;
+        this.ogun_id = ogun_id;
         this.ogun_tarihi = ogun_tarihi;
-        this.besin = besin;
-    }
-
-    public Users getUser() {
-        return user;
-    }
-
-    public void setUser(Users user) {
-        this.user = user;
-    }
-
-    public String getOgun_turu() {
-        return ogun_turu;
-    }
-
-    public void setOgun_turu(String ogun_turu) {
         this.ogun_turu = ogun_turu;
+        this.user_id = user_id;
+    }
+
+    public ArrayList<String> getBesin_id() {
+        return besin_id;
+    }
+
+    public void setBesin_id(ArrayList<String> besin_id) {
+        this.besin_id = besin_id;
+    }
+
+    public String getOgun_id() {
+        return ogun_id;
+    }
+
+    public void setOgun_id(String ogun_id) {
+        this.ogun_id = ogun_id;
     }
 
     public String getOgun_tarihi() {
@@ -43,11 +46,19 @@ public class Ogunler {
         this.ogun_tarihi = ogun_tarihi;
     }
 
-    public Besin getBesin() {
-        return besin;
+    public String getOgun_turu() {
+        return ogun_turu;
     }
 
-    public void setBesin(Besin besin) {
-        this.besin = besin;
+    public void setOgun_turu(String ogun_turu) {
+        this.ogun_turu = ogun_turu;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 }
