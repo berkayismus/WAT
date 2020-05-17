@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,25 +22,25 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.algolia.search.saas.Client;
-import com.algolia.search.saas.Index;
 import com.berkaycayli.wat.adapter.OgunAdapter;
+import com.berkaycayli.wat.objects.Besin;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 
 public class OgunActivity extends AppCompatActivity {
 
     // Bugünün tarihini tutalım
-    String bugunTarih;
+    private String bugunTarih = GuestActivity.getBugun();
 
     // Widgetleri tanımlama
     private TextView tvKalanKalori, tvAlinanKalori, tvKalanKaloriNumber, tvAlinanKaloriNumber;
@@ -53,8 +54,14 @@ public class OgunActivity extends AppCompatActivity {
 
     // Firebase tanımlama işlemleri
     private FirebaseAuth userAuth = FirebaseAuth.getInstance();
+    private FirebaseUser currentUser = userAuth.getCurrentUser();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference userColRef = db.collection("Users");
+    private CollectionReference ogunColRef = db.collection("Ogunler");
+
+    // ögün çekme
+    // Aşağıdaki kullanıcının öğünler koleksiyonundan gelen besin ID'lerini tutuyor
+    List<String> besinIDList;
 
 
 
@@ -138,8 +145,14 @@ public class OgunActivity extends AppCompatActivity {
                 datePickerDialog = new DatePickerDialog(OgunActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        bugunTarih = year+"-"+(month+1)+"-"+dayOfMonth;
-                      //  editTextTarih.setText(dayOfMonth+"/"+(month+1)+"/"+year);
+                        if((month+1) == 10 || (month+1) == 11 || (month+1) == 12){
+                            bugunTarih = year+"-"+(month+1)+"-"+dayOfMonth;
+                        } else{
+                            bugunTarih = year+"-0"+(month+1)+"-"+dayOfMonth;
+                        }
+
+                        //Toast.makeText(getApplicationContext(),bugunTarih,Toast.LENGTH_SHORT).show();
+                        besinIDGetirFromOgunler();
                     }
                 },yil,ay,gun);
 
@@ -188,8 +201,8 @@ public class OgunActivity extends AppCompatActivity {
         ogunlerList.add("Elma");
         ogunlerList.add("Armut");
 
-      //  ogunAdapter = new OgunAdapter(this,ogunlerList);
-     //   rvSabah.setAdapter(ogunAdapter);
+      ogunAdapter = new OgunAdapter(this,ogunlerList);
+      rvSabah.setAdapter(ogunAdapter);
 
         // rvOgle Düzenleme - (RecyclerView)
         rvOgle.setHasFixedSize(true);
@@ -277,6 +290,69 @@ public class OgunActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(),SearchActivity.class).putExtra("ogun_turu","aksam"));
             }
         });
+
+    }
+
+    public void besinIDGetirFromOgunler(){
+        // Ogunler -> user_id -> tarih -> sabah vb.
+        // ogunColRef - currentUser
+        ogunColRef.document(currentUser.getUid()).collection(bugunTarih).document("sabah").get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if(documentSnapshot.exists()){
+                            Map<String,Object> besinler= documentSnapshot.getData();
+                            besinIDList = (List) besinler.get("besin_id");
+                            Log.d("besin IDler", besinIDList.toString());
+                        } else{
+                            Toast.makeText(getApplicationContext(),"Öğün bulunamadı",Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+
+    }
+
+    public List<Besin> besinSorguList(){
+        final CollectionReference besinColRef = db.collection("Besinler");
+
+
+        final List<Besin> besinList = new ArrayList<Besin>();
+        for(int i=0; i<besinIDList.size(); i++){
+            besinColRef.document(besinIDList.get(i)).get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            //Map<String,Object> besinData = documentSnapshot.getData();
+
+                            Besin besinObject = documentSnapshot.toObject(Besin.class);
+                            besinList.add(besinObject);
+
+                            //String besin_adi = (String) besinData.get("besin_adi");
+                            //String besin_miktar = documentSnapshot.getString("besin_miktar");
+                            //Double besin_kalori = documentSnapshot.getDouble("besin_kalori");
+
+                        }
+
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                           // return null;
+                        }
+                    });
+
+
+
+        } // for döngüsü sonu
+
+        return besinList;
 
     }
 

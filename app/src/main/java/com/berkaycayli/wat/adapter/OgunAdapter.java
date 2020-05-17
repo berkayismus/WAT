@@ -12,16 +12,19 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.berkaycayli.wat.R;
+import com.berkaycayli.wat.objects.Besin;
 
 import java.util.List;
 
 public class OgunAdapter extends RecyclerView.Adapter<OgunAdapter.OgunCardItemsHolder> {
     private Context context;
-    private List<String> ogunlerDisaridanGelenList;
+    private List<String> ogunlerGelenList;
+   // private List<Besin> besinSorguListDisaridanGelen;
 
-    public OgunAdapter(Context context, List<String> ulkelerDisaridanGelenList) {
+    public OgunAdapter(Context context, List<String> ogunlerGelenList) {
         this.context = context;
-        this.ogunlerDisaridanGelenList = ulkelerDisaridanGelenList;
+        this.ogunlerGelenList = ogunlerGelenList;
+
     }
 
     public class OgunCardItemsHolder extends RecyclerView.ViewHolder{
@@ -52,7 +55,7 @@ public class OgunAdapter extends RecyclerView.Adapter<OgunAdapter.OgunCardItemsH
     // sürekli çalışır, tüm liste öğelerini belirlenen tasarıma döker
     @Override
     public void onBindViewHolder(@NonNull OgunCardItemsHolder holder, int position) {
-       final String ogun = ogunlerDisaridanGelenList.get(position);
+       final String ogun = ogunlerGelenList.get(position);
 
         holder.tvOgunAdi.setText(ogun);
         holder.cardViewOgun.setOnClickListener(new View.OnClickListener() {
@@ -65,7 +68,7 @@ public class OgunAdapter extends RecyclerView.Adapter<OgunAdapter.OgunCardItemsH
 
     @Override
     public int getItemCount() {
-        return ogunlerDisaridanGelenList.size();
+        return ogunlerGelenList.size();
     }
 
 
