@@ -20,12 +20,14 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.berkaycayli.wat.adapter.OgunAdapter;
 import com.berkaycayli.wat.objects.Besin;
+import com.berkaycayli.wat.objects.Ogunler;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -35,12 +37,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 public class OgunActivity extends AppCompatActivity {
 
     // Bugünün tarihini tutalım
-    private String bugunTarih = GuestActivity.getBugun();
+   private String bugunTarih = GuestActivity.getBugun();
+   // private String bugunTarih = "2020-05-17";
 
     // Widgetleri tanımlama
     private TextView tvKalanKalori, tvAlinanKalori, tvKalanKaloriNumber, tvAlinanKaloriNumber;
@@ -57,12 +59,15 @@ public class OgunActivity extends AppCompatActivity {
     private FirebaseUser currentUser = userAuth.getCurrentUser();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference userColRef = db.collection("Users");
-    private CollectionReference ogunColRef = db.collection("Ogunler");
+
+    // sabitler
+    public static String TAG = "besinIDGetirFromOgunler LOG";
 
     // ögün çekme
-    // Aşağıdaki kullanıcının öğünler koleksiyonundan gelen besin ID'lerini tutuyor
-    List<String> besinIDList;
-
+    private CollectionReference ogunColRef = db.collection("Ogunler");
+    private CollectionReference besinColRef = db.collection("Besinler");
+    private List<String> userBesinIDler = new ArrayList<String>();
+    private List<Besin> userBesinList = new ArrayList<Besin>();
 
 
     @Override
@@ -82,8 +87,10 @@ public class OgunActivity extends AppCompatActivity {
                 });
 
 
-        // aşağıdaki fonksiyon bugünün tarihini tutuyor, takvimden değiştirince güncelliyor
-        bugunTarih = GuestActivity.getBugun();
+
+
+
+
 
 
     }
@@ -107,6 +114,7 @@ public class OgunActivity extends AppCompatActivity {
         // imageView komponentleri tıklandığı anda ne olacağını aşağıdaki metodda belirliyorum
         imageViewClicked();
 
+        getUserBesin(currentUser.getUid(),bugunTarih,"sabah");
 
     }
 
@@ -151,8 +159,10 @@ public class OgunActivity extends AppCompatActivity {
                             bugunTarih = year+"-0"+(month+1)+"-"+dayOfMonth;
                         }
 
+
+                        //System.out.println(userBesinGetir(currentUser.getUid(),"sabah","2020-05-17"));
                         //Toast.makeText(getApplicationContext(),bugunTarih,Toast.LENGTH_SHORT).show();
-                        besinIDGetirFromOgunler();
+                      // besinIDGetirFromOgunler();
                     }
                 },yil,ay,gun);
 
@@ -197,12 +207,16 @@ public class OgunActivity extends AppCompatActivity {
         // başka bir görünüm
         //rv.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
 
-        ogunlerList = new ArrayList<>();
+/*        ogunlerList = new ArrayList<>();
         ogunlerList.add("Elma");
-        ogunlerList.add("Armut");
+        ogunlerList.add("Armut");*/
 
-      ogunAdapter = new OgunAdapter(this,ogunlerList);
-      rvSabah.setAdapter(ogunAdapter);
+
+/*        ogunAdapter = new OgunAdapter(this,userBesinList);
+        rvSabah.setAdapter(ogunAdapter);*/
+
+
+
 
         // rvOgle Düzenleme - (RecyclerView)
         rvOgle.setHasFixedSize(true);
@@ -293,67 +307,66 @@ public class OgunActivity extends AppCompatActivity {
 
     }
 
-    public void besinIDGetirFromOgunler(){
-        // Ogunler -> user_id -> tarih -> sabah vb.
-        // ogunColRef - currentUser
-        ogunColRef.document(currentUser.getUid()).collection(bugunTarih).document("sabah").get()
-                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+    public void getUserBesin(String userID,String ogunTarihi,String ogunTuru){
+
+
+
+
+        ogunColRef.document(userID).collection(ogunTarihi).document(ogunTuru)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if(documentSnapshot.exists()){
-                            Map<String,Object> besinler= documentSnapshot.getData();
-                            besinIDList = (List) besinler.get("besin_id");
-                            Log.d("besin IDler", besinIDList.toString());
-                        } else{
-                            Toast.makeText(getApplicationContext(),"Öğün bulunamadı",Toast.LENGTH_SHORT).show();
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()){
+                            DocumentSnapshot documentSnapshot = task.getResult();
+                            if(documentSnapshot.exists()){
+                                Ogunler userOgun = documentSnapshot.toObject(Ogunler.class);
+                                for(String besinIDItem : userOgun.getBesin_id()){
+                                    userBesinIDler.add(besinIDItem);
+                                    //System.out.println(besinIDItem);
+                                    besinColRef.document(besinIDItem).get()
+                                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                                                @Override
+                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                                    if(documentSnapshot.exists()){
+                                                        Besin userBesin = documentSnapshot.toObject(Besin.class);
+                                                        userBesinList.add(userBesin);
+                                                        System.out.println(userBesin.getBesin_adi());
+                                                    }
+
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Log.d(TAG, "onFailure: ",e);
+                                                }
+                                            });
+                                }
+                                ogunAdapter = new OgunAdapter(getApplicationContext(),userBesinList);
+                                rvSabah.setAdapter(ogunAdapter);
+
+
+                            } else{
+                                Log.d(TAG, "Döküman bulunamadı");
+                            }
                         }
-
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
                     }
                 });
 
-    }
-
-    public List<Besin> besinSorguList(){
-        final CollectionReference besinColRef = db.collection("Besinler");
-
-
-        final List<Besin> besinList = new ArrayList<Besin>();
-        for(int i=0; i<besinIDList.size(); i++){
-            besinColRef.document(besinIDList.get(i)).get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            //Map<String,Object> besinData = documentSnapshot.getData();
-
-                            Besin besinObject = documentSnapshot.toObject(Besin.class);
-                            besinList.add(besinObject);
-
-                            //String besin_adi = (String) besinData.get("besin_adi");
-                            //String besin_miktar = documentSnapshot.getString("besin_miktar");
-                            //Double besin_kalori = documentSnapshot.getDouble("besin_kalori");
-
-                        }
-
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                           // return null;
-                        }
-                    });
 
 
 
-        } // for döngüsü sonu
 
-        return besinList;
 
-    }
+
+
+
+    } // getUserBesin sonu
+
+
+
+
+
 
 } // class sonu

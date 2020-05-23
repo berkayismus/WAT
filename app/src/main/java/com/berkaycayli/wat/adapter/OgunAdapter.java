@@ -18,25 +18,25 @@ import java.util.List;
 
 public class OgunAdapter extends RecyclerView.Adapter<OgunAdapter.OgunCardItemsHolder> {
     private Context context;
-    private List<String> ogunlerGelenList;
+    private List<Besin> besinlerGelenList;
    // private List<Besin> besinSorguListDisaridanGelen;
 
-    public OgunAdapter(Context context, List<String> ogunlerGelenList) {
+    public OgunAdapter(Context context, List<Besin> besinlerGelenList) {
         this.context = context;
-        this.ogunlerGelenList = ogunlerGelenList;
+        this.besinlerGelenList = besinlerGelenList;
 
     }
 
     public class OgunCardItemsHolder extends RecyclerView.ViewHolder{
-        public TextView tvOgunAdi,tvOgunMiktar,tvOgunKalori;
-        public CardView cardViewOgun;
+        private TextView tvBesinAdi, tvBesinMiktar, tvBesinKalori;
+        private CardView cardViewOgun;
 
         public OgunCardItemsHolder(@NonNull View itemView) {
             super(itemView);
             cardViewOgun = itemView.findViewById(R.id.cardViewBesin);
-            tvOgunAdi = itemView.findViewById(R.id.card_besin_tvBesinAdi);
-            tvOgunMiktar = itemView.findViewById(R.id.card_besin_tvBesinMiktar);
-            tvOgunKalori = itemView.findViewById(R.id.card_besin_tvBesinKalori);
+            tvBesinAdi = itemView.findViewById(R.id.card_besin_tvBesinAdi);
+            tvBesinMiktar = itemView.findViewById(R.id.card_besin_tvBesinMiktar);
+            tvBesinKalori = itemView.findViewById(R.id.card_besin_tvBesinKalori);
 
         }
     }
@@ -55,20 +55,22 @@ public class OgunAdapter extends RecyclerView.Adapter<OgunAdapter.OgunCardItemsH
     // sürekli çalışır, tüm liste öğelerini belirlenen tasarıma döker
     @Override
     public void onBindViewHolder(@NonNull OgunCardItemsHolder holder, int position) {
-       final String ogun = ogunlerGelenList.get(position);
+        final Besin besin = besinlerGelenList.get(position);
 
-        holder.tvOgunAdi.setText(ogun);
+        holder.tvBesinAdi.setText(besin.getBesin_adi());
+        holder.tvBesinKalori.setText(String.valueOf(besin.getBesin_kalori()));
+        holder.tvBesinMiktar.setText(besin.getBesin_miktar());
         holder.cardViewOgun.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,"Seçtiğiniz öğün: "+ogun,Toast.LENGTH_SHORT).show();
+                Toast.makeText(context,"Seçtiğiniz öğün: "+besin.getBesin_adi(),Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return ogunlerGelenList.size();
+        return besinlerGelenList.size();
     }
 
 
