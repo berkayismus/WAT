@@ -1,12 +1,10 @@
 # WAT
-Bugün Ne Yedim Android Mobil Uygulaması
+Bugün Ne Yedim Android Mobil Uygulaması - Diyet takibinizi gerçekleştirebileceğiniz Açık Kaynak Proje
 
 # Sürüm notları v2.16
-- Besin ekleme aktif edildi 
-- Besin Listeleme aktif edildi
+- Besin Ekleme aktif edildi 
+- Besin Listeleme aktif edildi 
 - Takvim ayarlandı
-- Öğünler kısmında herhangi bir öğünün yanındaki "+" butonuna tıklayın, karşınıza gelen besinlerin herhangi birine tıkladığınızda, seçtiğiniz öğüne eklenecektir
-- Öğünler kısmında kullanıcının eklediği besinleri listeleme
 
 # Geliştirmesi devam edenler
 - Besin Eklemedeki hataları giderme
