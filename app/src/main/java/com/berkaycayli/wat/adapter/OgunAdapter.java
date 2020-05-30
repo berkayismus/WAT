@@ -58,7 +58,7 @@ public class OgunAdapter extends RecyclerView.Adapter<OgunAdapter.OgunCardItemsH
 
 
         holder.tvBesinAdi.setText(besin.getBesin_adi());
-        holder.tvBesinKalori.setText(String.valueOf(besin.getBesin_kalori()));
+        holder.tvBesinKalori.setText(String.valueOf(besin.getBesin_kalori()) + " Kalori");
         holder.tvBesinMiktar.setText(besin.getBesin_miktar());
         holder.cardViewOgun.setOnClickListener(new View.OnClickListener() {
             @Override

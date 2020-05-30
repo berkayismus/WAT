@@ -126,7 +126,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         switch (item.getItemId()){
             case R.id.action_photo:
-                Toast.makeText(this, "Foto ikonuna tıklandı", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(this, "Foto ikonuna tıklandı", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(getApplicationContext(),ResimCekActivity.class));
                 return true;
             case R.id.action_close:
                 finish();
@@ -176,7 +177,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         besinAdapter.setOnItemClickListener(new BesinAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
-                Besin besin = documentSnapshot.toObject(Besin.class);
+                final Besin besin = documentSnapshot.toObject(Besin.class);
                 //  Toast.makeText(getApplicationContext(),"Seçilen besin : "+besin.getBesin_adi(),Toast.LENGTH_SHORT).show();
                 // besin ekleme yapılıyor
                 String userID = currentUser.getUid();
@@ -190,7 +191,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(getApplicationContext(),"Seçtiğiniz besin öğününüze eklendi",Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(getApplicationContext(),"Seçtiğiniz besin öğününüze eklendi",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),besin.getBesin_adi()+" "+ogunTuru+" öğününüze eklendi",Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -218,32 +220,14 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         besinAdapter.stopListening();
     }
 
-    public void searchWithAlgolia(){
+    public void besinArama(){
+
+
+    }
+
+    public void algoliaEkle(String besinAdi,String besinID){
+
         Client client = new Client("7TY31JT4VI","d0758ab12ee292c58a951379ae2ad6b3");
-        Index index = client.getIndex("besinWAT");
-
-        CollectionReference besinRef = db.collection("Besinler");
-
-        Map<String,Object> besin1 = new HashMap<>();
-        besin1.put("title","besin1");
-        WriteBatch writeBatch = db.batch();
-        writeBatch.set(besinRef.document(),besin1);
-        writeBatch.commit();
-
-
-
-
-
-        // algolia
-        List<JSONObject> besinList = new ArrayList<>();
-        besinList.add(new JSONObject(besin1));
-        index.addObjectsAsync(new JSONArray(besinList),null);
-
-
-        // algolia
-
-        // arama yapmak
-
 
 
     }

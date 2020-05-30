@@ -25,10 +25,7 @@ import android.widget.TextView;
 import com.berkaycayli.wat.adapter.OgunAdapter;
 import com.berkaycayli.wat.objects.Besin;
 import com.berkaycayli.wat.objects.Ogunler;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -55,7 +52,7 @@ public class OgunActivity extends AppCompatActivity {
     // RecyclerView & Adapterları tanımlama
     private RecyclerView rvSabah,rvOgle,rvAksam;
     private ArrayList<String> ogunlerList;
-    private OgunAdapter ogunAdapter;
+    private OgunAdapter ogunAdapterSabah,ogunAdapterOgle,ogunAdapterAksam;
 
     // Firebase tanımlama işlemleri
     private FirebaseAuth userAuth = FirebaseAuth.getInstance();
@@ -70,8 +67,10 @@ public class OgunActivity extends AppCompatActivity {
     private CollectionReference ogunColRef = db.collection("Ogunler");
     private CollectionReference besinColRef = db.collection("Besinler");
     private List<String> userBesinIDler = new ArrayList<String>();
-    private List<Besin> userBesinList = new ArrayList<Besin>();
-    private int userKaloriToplam = 0;
+    private List<Besin> userBesinListSabah = new ArrayList<Besin>();
+    private List<Besin> userBesinListOgle = new ArrayList<Besin>();
+    private List<Besin> userBesinListAksam = new ArrayList<Besin>();
+    private int userKaloriToplam;
 
 
     @Override
@@ -89,13 +88,6 @@ public class OgunActivity extends AppCompatActivity {
                         }
                     }
                 });
-
-
-
-
-
-
-
 
     }
 
@@ -119,7 +111,11 @@ public class OgunActivity extends AppCompatActivity {
         imageViewClicked();
 
         // getUserBesin(currentUser.getUid(),bugunTarih,"sabah");
-        getUserBesinTest(currentUser.getUid(),bugunTarih,"sabah");
+        getUserBesin(currentUser.getUid(),bugunTarih,"sabah");
+        getUserBesin(currentUser.getUid(),bugunTarih,"ogle");
+        getUserBesin(currentUser.getUid(),bugunTarih,"aksam");
+
+
 
     }
 
@@ -163,11 +159,10 @@ public class OgunActivity extends AppCompatActivity {
                         } else{
                             bugunTarih = year+"-0"+(month+1)+"-"+dayOfMonth;
                         }
-                        getUserBesinTest(currentUser.getUid(),bugunTarih,"sabah");
+                        getUserBesin(currentUser.getUid(),bugunTarih,"sabah");
+                        getUserBesin(currentUser.getUid(),bugunTarih,"ogle");
+                        getUserBesin(currentUser.getUid(),bugunTarih,"aksam");
 
-                        //System.out.println(userBesinGetir(currentUser.getUid(),"sabah","2020-05-17"));
-                        //Toast.makeText(getApplicationContext(),bugunTarih,Toast.LENGTH_SHORT).show();
-                      // besinIDGetirFromOgunler();
                     }
                 },yil,ay,gun);
 
@@ -206,35 +201,27 @@ public class OgunActivity extends AppCompatActivity {
     }
 
     public void recyclerViewEdit(){
+
+
         // rvSabah Düzenleme - (RecyclerView)
         rvSabah.setHasFixedSize(true);
         rvSabah.setLayoutManager(new LinearLayoutManager(this));
         // başka bir görünüm
         //rv.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
-
-/*        ogunlerList = new ArrayList<>();
-        ogunlerList.add("Elma");
-        ogunlerList.add("Armut");*/
-
-
-/*        ogunAdapter = new OgunAdapter(this,userBesinList);
-        rvSabah.setAdapter(ogunAdapter);*/
-
-        ogunAdapter = new OgunAdapter(getApplicationContext(),userBesinList);
-        rvSabah.setAdapter(ogunAdapter);
-
-
-
+        ogunAdapterSabah = new OgunAdapter(getApplicationContext(), userBesinListSabah);
+        rvSabah.setAdapter(ogunAdapterSabah);
 
         // rvOgle Düzenleme - (RecyclerView)
         rvOgle.setHasFixedSize(true);
         rvOgle.setLayoutManager(new LinearLayoutManager(this));
-      //  rvOgle.setAdapter(ogunAdapter);
+        ogunAdapterOgle = new OgunAdapter(getApplicationContext(),userBesinListOgle);
+        rvOgle.setAdapter(ogunAdapterOgle);
 
         // rvAkşam Düzenleme - (RecyclerView)
         rvAksam.setHasFixedSize(true);
         rvAksam.setLayoutManager(new LinearLayoutManager(this));
-      //  rvAksam.setAdapter(ogunAdapter);
+        ogunAdapterAksam = new OgunAdapter(getApplicationContext(),userBesinListAksam);
+        rvAksam.setAdapter(ogunAdapterAksam);
     }
 
     public void toolbarEdit(){
@@ -256,7 +243,8 @@ public class OgunActivity extends AppCompatActivity {
                 if(rvSabah.getLayoutParams().height!=0){
                     RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, 0);
                     rvSabah.setLayoutParams(lp);
-                } else{
+                }
+                else{
                     RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                     rvSabah.setLayoutParams(lp);
                 }
@@ -315,67 +303,11 @@ public class OgunActivity extends AppCompatActivity {
 
     }
 
-    public void getUserBesin(String userID,String ogunTarihi,String ogunTuru){
 
 
+    public void getUserBesin(String userID, final String ogunTarihi, final String ogunTuru){
 
-
-        ogunColRef.document(userID).collection(ogunTarihi).document(ogunTuru)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if(task.isSuccessful()){
-                            DocumentSnapshot documentSnapshot = task.getResult();
-                            if(documentSnapshot.exists()){
-                                Ogunler userOgun = documentSnapshot.toObject(Ogunler.class);
-                                for(String besinIDItem : userOgun.getBesin_id()){
-                                    userBesinIDler.add(besinIDItem);
-                                    //System.out.println(besinIDItem);
-                                    besinColRef.document(besinIDItem).get()
-                                            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                                                @Override
-                                                public void onSuccess(DocumentSnapshot documentSnapshot) {
-                                                    if(documentSnapshot.exists()){
-                                                        Besin userBesin = documentSnapshot.toObject(Besin.class);
-                                                        userBesinList.add(userBesin);
-                                                        System.out.println(userBesin.getBesin_adi());
-                                                    }
-
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Log.d(TAG, "onFailure: ",e);
-                                                }
-                                            });
-                                }
-                                ogunAdapter = new OgunAdapter(getApplicationContext(),userBesinList);
-                                rvSabah.setAdapter(ogunAdapter);
-
-
-                            } else{
-                                Log.d(TAG, "Döküman bulunamadı");
-                            }
-                        }
-                    }
-                });
-
-
-
-
-
-
-
-
-
-    } // getUserBesin sonu
-
-    public void getUserBesinTest(String userID,String ogunTarihi,String ogunTuru){
-
-
-
+        tvAlinanKaloriNumber.setText(userKaloriToplam+" kcal");
 
         ogunColRef.document(userID).collection(ogunTarihi).document(ogunTuru)
                 .addSnapshotListener(new EventListener<DocumentSnapshot>() {
@@ -389,8 +321,10 @@ public class OgunActivity extends AppCompatActivity {
                         if(documentSnapshot != null && documentSnapshot.exists()){
                             Log.d(TAG, "Cuurent data :"+documentSnapshot.getData());
                             Ogunler userOgun = documentSnapshot.toObject(Ogunler.class);
-                            userKaloriToplam = 0;
-                            userBesinList.clear();
+                            //userKaloriToplam = 0;
+/*                            userBesinListSabah.clear();
+                            userBesinListOgle.clear();
+                            userBesinListAksam.clear();*/
                             for(String besinIDItem :  userOgun.getBesin_id()){
                                 userBesinIDler.add(besinIDItem);
                                 Log.d(TAG, "onEvent: "+besinIDItem);
@@ -405,7 +339,15 @@ public class OgunActivity extends AppCompatActivity {
                                         if(documentSnapshot != null && documentSnapshot.exists()){
                                             Log.d(TAG, "Cuurent data :"+documentSnapshot.getData());
                                             Besin userBesin = documentSnapshot.toObject(Besin.class);
-                                            userBesinList.add(userBesin);
+                                            if(ogunTuru.equals("sabah")){
+                                                userBesinListSabah.add(userBesin);
+                                            }
+                                            if (ogunTuru.equals("ogle")){
+                                                userBesinListOgle.add(userBesin);
+                                            }
+                                            if(ogunTuru.equals("aksam")){
+                                                userBesinListAksam.add(userBesin);
+                                            }
                                             //System.out.println(userBesin.getBesin_adi());
                                             userKaloriToplam = userKaloriToplam + userBesin.getBesin_kalori();
                                             tvAlinanKaloriNumber.setText(String.valueOf(userKaloriToplam + " kcal"));
@@ -422,7 +364,17 @@ public class OgunActivity extends AppCompatActivity {
                         }
                     }
                 });
-        ogunAdapter.notifyDataSetChanged();
+        ogunAdapterSabah.notifyDataSetChanged();
+        ogunAdapterOgle.notifyDataSetChanged();
+        ogunAdapterAksam.notifyDataSetChanged();
+        userKaloriToplam = 0;
+        userBesinListSabah.clear();
+        userBesinListOgle.clear();
+        userBesinListAksam.clear();
+/*        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        rvSabah.setLayoutParams(lp);
+        rvOgle.setLayoutParams(lp);
+        rvAksam.setLayoutParams(lp);*/
 
 
     //  ogunAdapter.notifyDataSetChanged();
@@ -431,16 +383,9 @@ public class OgunActivity extends AppCompatActivity {
         //tvAlinanKaloriNumber.setText(String.valueOf(userKaloriToplam));
 
 
+    } // getUserBesinTestSonu
 
 
-
-
-
-
-
-
-
-    }
 
 
 
