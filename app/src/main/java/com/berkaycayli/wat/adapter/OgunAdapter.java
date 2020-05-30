@@ -37,7 +37,6 @@ public class OgunAdapter extends RecyclerView.Adapter<OgunAdapter.OgunCardItemsH
             tvBesinAdi = itemView.findViewById(R.id.card_besin_tvBesinAdi);
             tvBesinMiktar = itemView.findViewById(R.id.card_besin_tvBesinMiktar);
             tvBesinKalori = itemView.findViewById(R.id.card_besin_tvBesinKalori);
-
         }
     }
 
@@ -56,6 +55,7 @@ public class OgunAdapter extends RecyclerView.Adapter<OgunAdapter.OgunCardItemsH
     @Override
     public void onBindViewHolder(@NonNull OgunCardItemsHolder holder, int position) {
         final Besin besin = besinlerGelenList.get(position);
+
 
         holder.tvBesinAdi.setText(besin.getBesin_adi());
         holder.tvBesinKalori.setText(String.valueOf(besin.getBesin_kalori()));
