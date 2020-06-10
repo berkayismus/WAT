@@ -1,6 +1,7 @@
 package com.berkaycayli.wat;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -19,11 +20,11 @@ import com.algolia.search.saas.AlgoliaException;
 import com.algolia.search.saas.Client;
 import com.algolia.search.saas.CompletionHandler;
 import com.algolia.search.saas.Index;
+import com.algolia.search.saas.Query;
 import com.berkaycayli.wat.adapter.BesinAdapter;
 import com.berkaycayli.wat.objects.Besin;
+
 import com.berkaycayli.wat.objects.Ogunler;
-import com.berkaycayli.wat.objects.Users;
-import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -31,42 +32,52 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.WriteBatch;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-    // Tanımlamalar yapılıyor
+    // Genel tanımlamalar
     private Toolbar toolbarSearch;
 
-    // Firestoredan veri çekmek için gerekli olan tanımlamalar yapılıyor
+    // Firestoredan tanımlamaları
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CollectionReference besinRef = db.collection("Besinler");
+    private CollectionReference besinColRef = db.collection("Besinler");
 
     // Recyclerview için tanımlamalar
     private RecyclerView recyclerViewBesin;
+    private List<Besin> besinList = new ArrayList<Besin>();
     private BesinAdapter besinAdapter;
 
     // besin ekleme yapabilmek için oluşturulan değişkenler
-    CollectionReference ogunRef = db.collection("Ogunler");
-    ArrayList<String> besinIDArray = new ArrayList<String>();
-    FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    FirebaseUser currentUser = mAuth.getCurrentUser();
     String ogunTuru = ""; // Öğün türü önceki sayfadan intent ile gelecek ( Seçilen öğüne göre )
+    private static final String TAG = "Öğün LOG";
+
+    // algolia tanımlamalar
+    Client client = new Client("7TY31JT4VI", "8dc615d927e06f9689b7b21ef4a9d92d");
+    Index index = client.getIndex("Besinler");
+
+    // besin eklemek için gerekli olanlar
+    FirebaseAuth userAuth = FirebaseAuth.getInstance();
+    FirebaseUser currentUser = userAuth.getCurrentUser();
+    ArrayList<String> besinIDArray = new ArrayList<String>();
+
+
+
 
 
     @Override
@@ -81,11 +92,18 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         toolbarEdit();
 
         // recyclerview düzenlemelerini aşağıdaki fonksiyonda gerçekleştiriyorum
-        setupRecyclerView();
+        besinGetir();
 
         // Öğün türünü intent ile önceki aktiviteden alalım
         Bundle extras = getIntent().getExtras();
         ogunTuru = extras.getString("ogun_turu");
+
+        //Intent intent = new Intent(getApplicationContext(),BesinEkleActivity.class);
+        //intent.put
+
+        // besinlere tıklandığında ne olacağını ayarlayalım
+        userBesinEkle();
+
 
 
     }
@@ -93,6 +111,12 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     // görsel öğeleri burada tanımlıyorum
     private void widgetInit(){
         toolbarSearch = findViewById(R.id.toolbarSearch);
+        recyclerViewBesin = findViewById(R.id.recyclerViewBesin);
+        recyclerViewBesin.setHasFixedSize(true);
+        recyclerViewBesin.setLayoutManager(new LinearLayoutManager(this));
+        besinAdapter = new BesinAdapter(getApplicationContext(),besinList);
+        recyclerViewBesin.setAdapter(besinAdapter);
+
 
     }
 
@@ -142,8 +166,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     // arama kısmına herhangi bir şey yazıp enter'a(veya telefondaysa arama ikonuna) basılınca tetiklenecek fonksiyon
     @Override
-    public boolean onQueryTextSubmit(String query) {
-        Log.e("Yapılan arama: ",query);
+    public boolean onQueryTextSubmit(String arananKelime) {
+        //Log.e("Yapılan arama: ",arananKelime);
 
         return true;
     }
@@ -153,84 +177,133 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public boolean onQueryTextChange(String newText) {
 
+        // algolia ile arama yapılıyor
+        Query query = new Query(newText)
+                .setAttributesToRetrieve("besin_adi")
+                .setHitsPerPage(20);
 
 
-        Log.e("Girilen harf: ",newText);
-        return true;
-    }
 
-    private void setupRecyclerView(){
 
-        Query query = besinRef.orderBy("besin_adi", Query.Direction.DESCENDING);
-
-        FirestoreRecyclerOptions<Besin> options = new FirestoreRecyclerOptions.Builder<Besin>()
-                .setQuery(query,Besin.class)
-                .build();
-
-        besinAdapter = new BesinAdapter(options);
-        recyclerViewBesin = findViewById(R.id.recyclerViewBesin);
-        recyclerViewBesin.setHasFixedSize(true);
-        recyclerViewBesin.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewBesin.setAdapter(besinAdapter);
-
-        // besinlerden herhangi birine tıklayınca ne olacağını ayarlayalım
-        besinAdapter.setOnItemClickListener(new BesinAdapter.OnItemClickListener() {
+       index.searchAsync(query, new CompletionHandler() {
             @Override
-            public void onItemClick(DocumentSnapshot documentSnapshot, int position) {
-                final Besin besin = documentSnapshot.toObject(Besin.class);
-                //  Toast.makeText(getApplicationContext(),"Seçilen besin : "+besin.getBesin_adi(),Toast.LENGTH_SHORT).show();
-                // besin ekleme yapılıyor
-                String userID = currentUser.getUid();
-                String ogun_tarihi = GuestActivity.getBugun();
-                String ogunID = userID+"/"+GuestActivity.getBugun()+"/"+ogunTuru;
-                besinIDArray.add(besin.getBesin_id());
-                // Ogunlerden yeni nesne üretmek için parametre list =>
-                // ArrayList<String> besin_id, String ogun_id, String ogun_tarihi, String ogun_turu, String user_id
-                Ogunler ogun = new Ogunler(besinIDArray,ogunID,ogun_tarihi,ogunTuru,userID);
-                ogunRef.document(userID+"/"+GuestActivity.getBugun()+"/"+ogunTuru).set(ogun)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                       // Toast.makeText(getApplicationContext(),"Seçtiğiniz besin öğününüze eklendi",Toast.LENGTH_SHORT).show();
-                        Toast.makeText(getApplicationContext(),besin.getBesin_adi()+" "+ogunTuru+" öğününüze eklendi",Toast.LENGTH_SHORT).show();
+            public void requestCompleted(@Nullable JSONObject content, @Nullable AlgoliaException e) {
+                try {
+                    JSONArray hits = content.getJSONArray("hits");
+                    //List<String> list = new ArrayList<>();
+                   // System.out.println();
+                    List<String> list = new ArrayList<String>();
+                    for (int i=0; i<hits.length(); i++){
+                        JSONObject jsonObject = hits.getJSONObject(i);
+                        // json olarak algolia besin indisini döndürüyorflutter
+                        //System.out.println(jsonObject);
+
+                        String besin_adi = jsonObject.getString("besin_adi");
+                        list.add(besin_adi);
+                        besinGetir(besin_adi);
+
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(getApplicationContext(),"Besin eklerken hata ile karşılaşıldı",Toast.LENGTH_SHORT).show();
-                        Log.e("Firestore", "Besin eklerken hata",e);
-                    }
-                });
+                    // arrayadapter tanımı
+                    // recyclerViewBesin.setAdapter(arrayAdapter);
+                   System.out.println("Arama sonucu "+list.toString());
+
+                } catch (JSONException ex) {
+                    ex.printStackTrace();
+                }
 
             }
         });
 
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        besinAdapter.startListening();
-    }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        besinAdapter.stopListening();
-    }
-
-    public void besinArama(){
+       // Log.d("Girilen harf: ",newText);
+        return true;
 
 
     }
 
-    public void algoliaEkle(String besinAdi,String besinID){
+    private void besinGetir(){
 
-        Client client = new Client("7TY31JT4VI","d0758ab12ee292c58a951379ae2ad6b3");
+        besinColRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
+                // sonradan eklenen listenin tamamını tekrar eklemesin diye besinList.clear
+                besinList.clear();
+                for (DocumentSnapshot documentSnapshot : documentSnapshots){
+                    Besin besin = documentSnapshot.toObject(Besin.class);
+                    besinList.add(besin);
+                }
+                // besinAdapter'ü durumdan haberdar edelim
+                besinAdapter.notifyDataSetChanged();
+            }
+        });
 
 
+    } // besinGetir Sonu
+
+    private void besinGetir(String besin_adi){
+        besinColRef
+                .whereEqualTo("besin_adi", besin_adi)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<Besin> arananBesinList = new ArrayList<Besin>();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Besin arananBesin = document.toObject(Besin.class);
+                                arananBesinList.add(arananBesin);
+                                //
+
+                            }
+                            besinAdapter = new BesinAdapter(getApplicationContext(),arananBesinList);
+                            recyclerViewBesin.setAdapter(besinAdapter);
+                            userBesinEkle();
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
     }
 
 
-}
+    private void userBesinEkle(){
+
+        // Ogunler -> userID -> bugununTarihi -> ogunTuru
+        besinAdapter.setOnItemClickListener(new BesinAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(final int position) {
+                //Toast.makeText(getApplicationContext(),"SearchActivity "+besinList.get(position).getBesin_adi(),Toast.LENGTH_SHORT).show();
+                String userID = currentUser.getUid();
+                String ogun_tarihi = GuestActivity.getBugun();
+                String ogunID = userID+"/"+GuestActivity.getBugun()+"/"+ogunTuru;
+                besinIDArray.add(besinList.get(position).getBesin_id());
+                Ogunler ogun = new Ogunler(besinIDArray,ogunID,ogun_tarihi,ogunTuru,userID);
+                DocumentReference ogunDocRef = db.collection("Ogunler").document(userID+"/"+GuestActivity.getBugun()+"/"+ogunTuru);
+                ogunDocRef.set(ogun)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(getApplicationContext(),besinList.get(position).getBesin_adi()+" "+ogunTuru+" öğününüze eklendi",Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.e("Firestore", "Besin eklerken hata",e);
+                            }
+                        });
+
+            }
+        });
+    }
+
+
+
+
+
+
+
+
+} // class sonu
+

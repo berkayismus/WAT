@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -16,6 +17,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -78,7 +80,15 @@ public class BesinEkleActivity extends AppCompatActivity {
                // girilen değerler uygunsa kaydedelim
                String besinID = UUID.randomUUID().toString();
                Besin yeniBesin = new Besin(besinID,besinAd,besinMiktar,besinKalori,besinProtein,besinSeker,besinYag);
-               algoliaEkle(yeniBesin);
+               Map<String,Object> yeniBesinMap = new HashMap<>();
+               yeniBesinMap.put("besin_id",besinID);
+               yeniBesinMap.put("besin_adi",besinAd);
+               yeniBesinMap.put("besin_miktar",besinMiktar);
+               yeniBesinMap.put("besin_kalori",besinKalori);
+               yeniBesinMap.put("besin_protein",besinProtein);
+               yeniBesinMap.put("besin_seker",besinSeker);
+               yeniBesinMap.put("besin_yag",besinYag);
+               algoliaEkle(yeniBesinMap);
 
 
                // Firestoredaki Besinler koleksiyonuna besin ekleme fonksiyonu yazalım
@@ -119,17 +129,25 @@ public class BesinEkleActivity extends AppCompatActivity {
     }
 
 
-    public void algoliaEkle(Besin yeniBesinObject) {
+    public static void algoliaEkle(Map<String,Object> yeniBesinMap)  {
+        Client client = new Client("7TY31JT4VI", "8dc615d927e06f9689b7b21ef4a9d92d");
+        Index index = client.getIndex("Besinler");
 
-        Client client = new Client("7TY31JT4VI","8dc615d927e06f9689b7b21ef4a9d92d");
-        Index index = client.getIndex("besinWAT");
 
         try{
-            index.addObjectAsync(new JSONObject().put("besin_adi",yeniBesinObject.getBesin_adi()),null);
-        } catch (JSONException ex){
-            Toast.makeText(getApplicationContext(),"indexlerken hata",Toast.LENGTH_SHORT).show();
+            List<JSONObject> array = new ArrayList<JSONObject>();
+
+            array.add(
+                    new JSONObject(yeniBesinMap)
+            );
+
+            index.addObjectsAsync(new JSONArray(array), null);
+        } catch (Exception ex){
+            System.out.println(ex.getLocalizedMessage());
         }
+
+
     }
 
 
-}
+} // class sonu
