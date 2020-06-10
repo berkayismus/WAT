@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +38,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 
 public class OgunActivity extends AppCompatActivity {
 
@@ -114,6 +116,8 @@ public class OgunActivity extends AppCompatActivity {
         getUserBesin(currentUser.getUid(),bugunTarih,"sabah");
         getUserBesin(currentUser.getUid(),bugunTarih,"ogle");
         getUserBesin(currentUser.getUid(),bugunTarih,"aksam");
+
+        //besinSPGetir("sabah");
 
 
 
@@ -384,6 +388,14 @@ public class OgunActivity extends AppCompatActivity {
 
 
     } // getUserBesinTestSonu
+
+
+    private void besinSPGetir(String ogunTuru){
+        String spKey = currentUser.getUid()+"/"+GuestActivity.getBugun()+"/"+ogunTuru;
+        SharedPreferences sp = getSharedPreferences(spKey,MODE_PRIVATE);
+        Set<String> besinSet = sp.getStringSet(spKey, null);
+        System.out.println("Kullanıcının besinleri (set) "+besinSet.toString());
+    }
 
 
 

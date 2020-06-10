@@ -9,11 +9,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.algolia.search.saas.AlgoliaException;
@@ -46,8 +46,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -75,6 +76,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     FirebaseAuth userAuth = FirebaseAuth.getInstance();
     FirebaseUser currentUser = userAuth.getCurrentUser();
     ArrayList<String> besinIDArray = new ArrayList<String>();
+    ArrayList<String> eskiBesinIDArray = new ArrayList<String>();
 
 
 
@@ -103,6 +105,11 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         // besinlere tıklandığında ne olacağını ayarlayalım
         userBesinEkle();
+
+        // sayfa kapandığında eklenen besinleri kaybetmemek için yazılan fonksiyon
+        // bu fonksiyondan önce , sayfa her açıldığında besin_id array'ine override ediyodu
+        besinIDGetirFirebase(ogunTuru);
+
 
 
 
@@ -182,6 +189,15 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 .setAttributesToRetrieve("besin_adi")
                 .setHitsPerPage(20);
 
+        if(newText.equals("")){
+            // çalışıyor
+            //Toast.makeText(getApplicationContext(),"Aramanız boş",Toast.LENGTH_SHORT).show();
+
+            //besinAdapter.notifyDataSetChanged();
+            //besinAdapter = new BesinAdapter(getApplicationContext(),besinList);
+            //recyclerViewBesin.setAdapter(besinAdapter);
+        }
+
 
 
 
@@ -250,14 +266,16 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             List<Besin> arananBesinList = new ArrayList<Besin>();
+                            besinList.clear();
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Besin arananBesin = document.toObject(Besin.class);
-                                arananBesinList.add(arananBesin);
-                                //
+                               // arananBesinList.add(arananBesin);
+                                besinList.add(arananBesin);
 
                             }
-                            besinAdapter = new BesinAdapter(getApplicationContext(),arananBesinList);
-                            recyclerViewBesin.setAdapter(besinAdapter);
+                            //besinAdapter = new BesinAdapter(getApplicationContext(),arananBesinList);
+                           // recyclerViewBesin.setAdapter(besinAdapter);
+                            besinAdapter.notifyDataSetChanged();
                             userBesinEkle();
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -296,14 +314,71 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
             }
         });
+
+       // besinSPKaydet();
     }
 
+    private void besinSPKaydet(){
+        String spKey = currentUser.getUid()+"/"+GuestActivity.getBugun()+"/"+ogunTuru;
+        SharedPreferences sp = getSharedPreferences(spKey,MODE_PRIVATE);
+        SharedPreferences.Editor edit = sp.edit();
+        Set<String> besinSet = new HashSet<String>();
+        besinSet.addAll(besinIDArray);
+        edit.putStringSet(spKey, besinSet);
+        edit.commit();
+    }
+
+    private void besinIDGetirFirebase(final String ogunTuru){
+        // koleksiyon path
+        // Ogunler -> userID -> bugununTarihi -> ogunTuru(sabah) -> besin_id(array)
+        // Bu fonksiyon Firebasede önceden eklenen besinID'leri , SearchActivity'i her açtığımızda sıfırlanan besinIDArray'ine eklemeye yarıyor
+        // böylece önceden eklenen besinler kaybolmuyor
+
+        String userID = currentUser.getUid();
+        String bugununTarihi = GuestActivity.getBugun();
+        //System.out.println(bugununTarihi);
+
+        eskiBesinIDArray.clear();
+        DocumentReference ogunDocRef = db.collection("Ogunler").document(userID+"/"+bugununTarihi+"/"+ogunTuru);
+        ogunDocRef.get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if(documentSnapshot.exists()){
+                            Ogunler ogun = documentSnapshot.toObject(Ogunler.class);
+                            for (String besinID : ogun.getBesin_id()){
+                                eskiBesinIDArray.add(besinID);
+                            }
+/*                            for(String eskiBesinID : eskiBesinIDArray){
+                                //Log.d(TAG, "Eski Besin ID'ler besinIDArray'ine ekleniyor");
+                                besinIDArray.add(eskiBesinID);
+                            }*/
+                        }
+
+
+                        //System.out.println("USER ID "+ogun.getUser_id()); // çalışıyor
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Besin ID getirirken hata",e);
+                    }
+                });
+
+        if(eskiBesinIDArray!=null){
+            for (String eskiBesinID : eskiBesinIDArray){
+                besinIDArray.add(eskiBesinID);
+            }
+        }
 
 
 
+    }
 
-
-
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 } // class sonu
 
