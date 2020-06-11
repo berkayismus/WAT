@@ -11,9 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.algolia.search.saas.AlgoliaException;
@@ -40,12 +44,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.ml.vision.FirebaseVision;
+import com.google.firebase.ml.vision.common.FirebaseVisionImage;
+import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel;
+import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -77,6 +87,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     FirebaseUser currentUser = userAuth.getCurrentUser();
     ArrayList<String> besinIDArray = new ArrayList<String>();
     ArrayList<String> eskiBesinIDArray = new ArrayList<String>();
+
+    // görüntü tanıma
+    String aranan="";
 
 
 
@@ -113,6 +126,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
 
 
+
+
     }
 
     // görsel öğeleri burada tanımlıyorum
@@ -123,6 +138,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         recyclerViewBesin.setLayoutManager(new LinearLayoutManager(this));
         besinAdapter = new BesinAdapter(getApplicationContext(),besinList);
         recyclerViewBesin.setAdapter(besinAdapter);
+
 
 
     }
@@ -158,7 +174,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         switch (item.getItemId()){
             case R.id.action_photo:
                // Toast.makeText(this, "Foto ikonuna tıklandı", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(getApplicationContext(),ResimCekActivity.class));
+                //startActivity(new Intent(getApplicationContext(), ImageRecogActivity.class));
+                galeriyiAc();
                 return true;
             case R.id.action_close:
                 finish();
@@ -184,59 +201,13 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public boolean onQueryTextChange(String newText) {
 
-        // algolia ile arama yapılıyor
-        Query query = new Query(newText)
-                .setAttributesToRetrieve("besin_adi")
-                .setHitsPerPage(20);
-
-        if(newText.equals("")){
-            // çalışıyor
-            //Toast.makeText(getApplicationContext(),"Aramanız boş",Toast.LENGTH_SHORT).show();
-
-            //besinAdapter.notifyDataSetChanged();
-            //besinAdapter = new BesinAdapter(getApplicationContext(),besinList);
-            //recyclerViewBesin.setAdapter(besinAdapter);
-        }
-
-
-
-
-       index.searchAsync(query, new CompletionHandler() {
-            @Override
-            public void requestCompleted(@Nullable JSONObject content, @Nullable AlgoliaException e) {
-                try {
-                    JSONArray hits = content.getJSONArray("hits");
-                    //List<String> list = new ArrayList<>();
-                   // System.out.println();
-                    List<String> list = new ArrayList<String>();
-                    for (int i=0; i<hits.length(); i++){
-                        JSONObject jsonObject = hits.getJSONObject(i);
-                        // json olarak algolia besin indisini döndürüyorflutter
-                        //System.out.println(jsonObject);
-
-                        String besin_adi = jsonObject.getString("besin_adi");
-                        list.add(besin_adi);
-                        besinGetir(besin_adi);
-
-                    }
-                    // arrayadapter tanımı
-                    // recyclerViewBesin.setAdapter(arrayAdapter);
-                   System.out.println("Arama sonucu "+list.toString());
-
-                } catch (JSONException ex) {
-                    ex.printStackTrace();
-                }
-
-            }
-        });
-
-
+        algoliaIleAra(newText);
 
        // Log.d("Girilen harf: ",newText);
         return true;
 
-
     }
+
 
     private void besinGetir(){
 
@@ -379,6 +350,127 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+
+    private void galeriyiAc(){
+        Intent i = new Intent();
+        i.setType("image/*");
+        i.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(i,"select images"),121);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // galeriyi açınca ne olacak
+        if(requestCode == 121){
+            //imageViewChoose.setImageURI(data.getData());
+
+            FirebaseVisionImage image;
+            try {
+                image = FirebaseVisionImage.fromFilePath(getApplicationContext(), data.getData());
+                FirebaseVisionImageLabeler labeler = FirebaseVision.getInstance()
+                        .getOnDeviceImageLabeler();
+
+                final ArrayList<Float> olasilikList = new ArrayList<Float>();
+                final ArrayList<String> olasilikNames = new ArrayList<String>();
+
+                labeler.processImage(image)
+                        .addOnSuccessListener(new OnSuccessListener<List<FirebaseVisionImageLabel>>() {
+                            @Override
+                            public void onSuccess(List<FirebaseVisionImageLabel> labels) {
+                                // Task completed successfully
+                                // ...
+                                for (FirebaseVisionImageLabel label: labels) {
+                                    String text = label.getText();
+                                    String entityId = label.getEntityId();
+                                    float confidence = label.getConfidence();
+/*                                    tvChoose.append(
+                                            text+" "+confidence+"\n"
+                                    );*/
+                                    //Log.d("Görüntü Tanıma", text+" "+confidence+"\n");
+
+                                    olasilikList.add(confidence);
+                                    olasilikNames.add(text);
+
+                                }
+                                String besin_adi = olasilikNames.get(olasilikList.indexOf(getMax(olasilikList)));
+                                Float en_buyuk_deger = getMax(olasilikList);
+                                Log.d(TAG, "Büyük olasılıkla: "+besin_adi);
+                                Log.d(TAG, "Olasılık Değeri: "+en_buyuk_deger);
+                                if(en_buyuk_deger==(float) 0.70059323){
+                                    Toast.makeText(getApplicationContext(),"Bu bir simittir",Toast.LENGTH_SHORT).show();
+                                    aranan = "simit";
+                                    algoliaIleAra(aranan);
+                                }
+                                if(en_buyuk_deger==(float) 0.9296008){
+                                    Toast.makeText(getApplicationContext(),"Bu bir armuttur",Toast.LENGTH_SHORT).show();
+                                    aranan = "armut";
+                                    algoliaIleAra(aranan);
+                                }
+
+
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Task failed with an exception
+                                // ...
+                            }
+                        });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Float getMax(ArrayList<Float> list){
+        Float max = 0.0f;
+        for(int i=0; i<list.size(); i++){
+            if(list.get(i) > max){
+                max = list.get(i);
+            }
+        }
+        return max;
+    }
+
+    private void algoliaIleAra(String aranan){
+        // algolia ile arama yapılıyor
+        Query query = new Query(aranan)
+                .setAttributesToRetrieve("besin_adi")
+                .setHitsPerPage(20);
+
+
+        index.searchAsync(query, new CompletionHandler() {
+            @Override
+            public void requestCompleted(@Nullable JSONObject content, @Nullable AlgoliaException e) {
+                try {
+                    JSONArray hits = content.getJSONArray("hits");
+                    //List<String> list = new ArrayList<>();
+                    // System.out.println();
+                    List<String> list = new ArrayList<String>();
+                    for (int i=0; i<hits.length(); i++){
+                        JSONObject jsonObject = hits.getJSONObject(i);
+                        // json olarak algolia besin indisini döndürüyorflutter
+                        //System.out.println(jsonObject);
+
+                        String besin_adi = jsonObject.getString("besin_adi");
+                        list.add(besin_adi);
+                        besinGetir(besin_adi);
+
+                    }
+                    // arrayadapter tanımı
+                    // recyclerViewBesin.setAdapter(arrayAdapter);
+                    System.out.println("Arama sonucu "+list.toString());
+
+                } catch (JSONException ex) {
+                    ex.printStackTrace();
+                }
+
+            }
+        });
     }
 } // class sonu
 

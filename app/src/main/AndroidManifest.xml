@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ResimCekActivity"></activity>
+        <activity android:name=".ImageRecogActivity"></activity>
         <activity android:name=".BesinEkleActivity" />
         <activity
             android:name=".SearchActivity"
@@ -29,6 +29,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="label" />
+        <!-- To use multiple models: android:value="label,model2,model3" -->
     </application>
 
 </manifest>

@@ -7,7 +7,10 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         android:icon="@drawable/action_ara"
         android:title="Ara"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+
+        />
+
     <item
         android:id="@+id/action_photo"
         android:icon="@drawable/ic_photo_camera_black_24dp"
