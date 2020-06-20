@@ -232,7 +232,7 @@ public class OgunActivity extends AppCompatActivity {
         // toolbar Ayarları
         toolbar.setTitle("Öğünler");
         toolbar.setTitleTextColor(getResources().getColor(R.color.toolbarTitleColor));
-        toolbar.setSubtitle("Toolbar altbaşlığı");
+        toolbar.setSubtitle(""); // toolbara alt başlık ekler
         toolbar.setLogo(R.drawable.icon_toolbar); // toolbar için icon ayarlama
         setSupportActionBar(toolbar); // toolbarı ayarlama
     }

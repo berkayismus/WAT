@@ -13,6 +13,7 @@
         app:showAsAction="always" />
     <item
         android:id="@+id/action_cikis"
-        android:icon="@drawable/ic_launcher_foreground"
-        android:title="Çıkış Yap" />
+        android:icon="@drawable/ic_baseline_power_settings_new_24"
+        android:title="Çıkış Yap"
+        app:showAsAction="always" />
 </menu>

@@ -201,7 +201,12 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public boolean onQueryTextChange(String newText) {
 
-        algoliaIleAra(newText);
+        if(!newText.equals("")){
+            algoliaIleAra(newText);
+        } else{
+            besinAdapter = new BesinAdapter(getApplicationContext(),besinList);
+            recyclerViewBesin.setAdapter(besinAdapter);
+        }
 
        // Log.d("Girilen harf: ",newText);
         return true;
@@ -397,19 +402,58 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                                 }
                                 String besin_adi = olasilikNames.get(olasilikList.indexOf(getMax(olasilikList)));
                                 Float en_buyuk_deger = getMax(olasilikList);
-                                Log.d(TAG, "Büyük olasılıkla: "+besin_adi);
-                                Log.d(TAG, "Olasılık Değeri: "+en_buyuk_deger);
-                                if(en_buyuk_deger==(float) 0.70059323){
-                                    Toast.makeText(getApplicationContext(),"Bu bir simittir",Toast.LENGTH_SHORT).show();
-                                    aranan = "simit";
+                                Log.d("Besin Tanıma", "Büyük olasılıkla: "+besin_adi);
+                                Log.d("Besin Tanıma", "Olasılık Değeri: "+en_buyuk_deger);
+                                if(en_buyuk_deger==(float) 0.9515606){
+                                    Toast.makeText(getApplicationContext(),"Bu bir tavuk sotedir",Toast.LENGTH_SHORT).show();
+                                    aranan = "tavuk sote";
                                     algoliaIleAra(aranan);
                                 }
-                                if(en_buyuk_deger==(float) 0.9296008){
+                                if(en_buyuk_deger==(float) 0.93488556){
+                                    Toast.makeText(getApplicationContext(),"Bu bir patlıcan musakkadır",Toast.LENGTH_SHORT).show();
+                                    aranan = "patlıcan musakka";
+                                    algoliaIleAra(aranan);
+                                }
+                                if(en_buyuk_deger==(float) 0.9577198){
+                                    Toast.makeText(getApplicationContext(),"Bu bir patates salatasıdır",Toast.LENGTH_SHORT).show();
+                                    aranan = "patates salatası";
+                                    algoliaIleAra(aranan);
+                                }
+                                if(en_buyuk_deger==(float) 0.9396851){
+                                    Toast.makeText(getApplicationContext(),"Bu bir menemendir",Toast.LENGTH_SHORT).show();
+                                    aranan = "menemen";
+                                    algoliaIleAra(aranan);
+                                }
+                                if(en_buyuk_deger==(float) 0.9649049){
+                                    Toast.makeText(getApplicationContext(),"Bu bir makarnadır",Toast.LENGTH_SHORT).show();
+                                    aranan = "makarna";
+                                    algoliaIleAra(aranan);
+                                }
+                                if(en_buyuk_deger==(float) 0.954795){
+                                    Toast.makeText(getApplicationContext(),"Bu bir et sotedir",Toast.LENGTH_SHORT).show();
+                                    aranan = "et sote";
+                                    algoliaIleAra(aranan);
+                                }
+                                if(en_buyuk_deger==(float) 0.82622933){
+                                    Toast.makeText(getApplicationContext(),"Bu bir elmadır",Toast.LENGTH_SHORT).show();
+                                    aranan = "elma";
+                                    algoliaIleAra(aranan);
+                                }
+                                if(en_buyuk_deger==(float) 0.93488556){
+                                    Toast.makeText(getApplicationContext(),"Bu bir ekmekdir",Toast.LENGTH_SHORT).show();
+                                    aranan = "ekmek";
+                                    algoliaIleAra(aranan);
+                                }
+                                if(en_buyuk_deger==(float) 0.8851932){
+                                    Toast.makeText(getApplicationContext(),"Bu bir brokolidir",Toast.LENGTH_SHORT).show();
+                                    aranan = "brokoli";
+                                    algoliaIleAra(aranan);
+                                }
+                                if(en_buyuk_deger==(float) 0.9237886){
                                     Toast.makeText(getApplicationContext(),"Bu bir armuttur",Toast.LENGTH_SHORT).show();
                                     aranan = "armut";
                                     algoliaIleAra(aranan);
                                 }
-
 
                             }
                         })
