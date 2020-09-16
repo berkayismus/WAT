@@ -7,7 +7,7 @@ Bugün Ne Yedim, tabiri caizse bir öğün ajandasıdır. Sağlıklı yaşamanı
 ![WAT thumb](https://im6.ezgif.com/tmp/ezgif-6-a4c79edd1e7b.gif)
 
 # Ne kullandım
-Uygulamayı geliştirirken code base'de **Java**, Database kısmında **Firebase**, Besin Arama kısmında **Algolia API** kullandım.
+Uygulamayı geliştirirken code base'de **Java**, Database kısmında **Firebase**, Metin ile besin Arama kısmında **Algolia API**, Görüntü tanıma ile Besin Arama kısmında **Firebase ML Kit** kullandım.
 
 # Sürüm notları v2.22
 - Besin Ekleme aktif edildi 
