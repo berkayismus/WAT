@@ -4,7 +4,7 @@ Bugün Ne Yedim adlı Android Mobil Uygulaması sayesinde diyet takibinizi kolay
 Bugün Ne Yedim, tabiri caizse bir öğün ajandasıdır. Sağlıklı yaşamanıza yardımcı olur, ne kadar kalori almanız gerektiğini sizin yerinize hesaplar.
 
 # Nasıl görünüyor
-![WAT thumb](https://www.linkpicture.com/q/BugnNeYedim-20200916141554.gif)
+![WAT thumb](https://i.ibb.co/0j7PXNx/Bugn-Ne-Yedim-20200916141554.gif)
 
 # Ne kullandım
 Uygulamayı geliştirirken code base'de **Java**, Database kısmında **Firebase**, Metin ile besin Arama kısmında **Algolia API**, Görüntü tanıma ile Besin Arama kısmında **Firebase ML Kit** kullandım.
